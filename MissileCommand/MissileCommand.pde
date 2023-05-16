@@ -1,3 +1,6 @@
+/**
+ * Imports and global variables required for the game
+ */
 import processing.core.*;
 import java.util.Set;
 import java.util.HashSet;
@@ -24,7 +27,9 @@ boolean gameOver = false;
 int lives = 6;
 
 
-
+/**
+ * Imports and global variables required for the game
+ */
 class GameObj {
   boolean isEnemy;
   PVector pos;
@@ -49,12 +54,18 @@ class GameObj {
   }
 }
 
+/**
+ * Imports and global variables required for the game
+ */
 void createCity() {
     for (int i = 0; i < 6; i++) {
     citys.add(new GameObj(new PVector(267 + 133 * i, canvasHeight - 20), null, color(0, 255, 0), 0, true, 0, null, false));
   }
 }
 
+/**
+ * Start the game again when a mouse button is pressed
+ */
 void mousePressed() {
     if (gameOver) {
     createCity();
@@ -67,7 +78,9 @@ void mousePressed() {
   }
 }
 
-// Set up canvas and initialize game objects
+/**
+ * Function to setup canvas and initialize game objects
+ */
 void setup() {
   size(1200, 900);
   scorefont = createFont("Comic Sans MS", 15);
@@ -88,27 +101,35 @@ void setup() {
 
 
 
-// Main game draw loop
+/**
+ * Main game draw loop
+ */
 void draw() {
+
+  // Background image
   image(backgroundImage, 0, 0, canvasWidth, canvasHeight);
 
+  // City gradients
   for (GameObj city : citys) {
     cityGradient(city.pos.x, city.pos.y, 50, 50, city.col, color(0, 125, 125));
   }
 
+  // Base gradients and armed state
   for (GameObj base : bases) {
     baseGradient(base.pos.x, base.pos.y, 20, 20, base.col, color(0, 51, 204));
     base.armedIn = max(0, base.armedIn - 1);
     baseGradient(base.pos.x, base.pos.y - 20 + base.armedIn, 5, 5, color(0, 255, 99), color(0, 153, 51));
   }
 
-// Draw base and missile gradients
+// Missile gradients, movement, and collision detection
 for (int i = 0; i < missiles.size(); i++) {
   GameObj missile = missiles.get(i);
 
+  // Missile movement and drawing
   missile.pos.add(missile.v);
   missileGradient(missile.pos.x, missile.pos.y, 5, 5, missile.col, color(255, 51, 51));
 
+    // Missile collision with ground
     if (missile.pos.y >= canvasHeight - 20) {
       missile.alive = false;
       if (!missile.alive) {
@@ -126,6 +147,8 @@ for (int i = 0; i < missiles.size(); i++) {
           }
         }
         missiles.remove(i);
+
+    // Play explosion sound effect
     if (frameCount % 4 == 0) {
     boom1.play();
     }
@@ -139,15 +162,19 @@ for (int i = 0; i < missiles.size(); i++) {
     }
     }
 
+    // Game over trigger logic
     if (lives <= 0) {
     gameOver = true;
 }
   } else {
+
+    // Missile trail
     stroke(missile.col);
     strokeWeight(5);
     line(missile.pos.x, missile.pos.y, missile.pos.x - missile.v.x * missile.tail, missile.pos.y - missile.v.y * missile.tail);
   }
 
+  // Missile collisions with other missiles
   for (int j = 0; j < missiles.size(); j++) {
     GameObj missile2 = missiles.get(j);
 
@@ -155,6 +182,7 @@ for (int i = 0; i < missiles.size(); i++) {
       if (dist(missile.pos.x, missile.pos.y, missile2.pos.x, missile2.pos.y) <= 100) {
         explosions.add(new GameObj(missile.pos.copy(), null, color(200, 0, 0), 0, true, 0, null, true));
         explosions.add(new GameObj(missile2.pos.copy(), null, color(200, 0, 0), 0, true, 0, null, true));
+      // Play explosion sound effect
       if (frameCount % 4 == 0) {
     boom1.play();
     }
@@ -190,6 +218,7 @@ for (Integer index : sortedIndicesToRemove) {
 }
 missilesToRemove.clear();
 
+// Game over logic
 if (gameOver) {
   fill(255, 0, 0);
   textAlign(CENTER, CENTER);
@@ -201,6 +230,7 @@ if (gameOver) {
   text("Click to continue", canvasWidth / 2, canvasHeight - 200);
 }
 
+// Round progression logic
 if (!roundStarted) {
     roundNum += 1;
     endFrame = 300 * (roundNum);
@@ -213,7 +243,7 @@ if (!roundStarted) {
     roundStarted = true;
 }
 
-
+// Base firing and cooldown logic
 if (missiles.size() > 0) {
   if (mousePressed) {
     ArrayList<GameObj> armed = new ArrayList<GameObj>();
@@ -266,6 +296,7 @@ for (GameObj explosion : explosions) {
         explosion.alive = false;
     }
 
+// Trigger the next round
 if (currentFrame == endFrame - 5) {
   roundStarted = false;
 
@@ -284,7 +315,9 @@ text("Lives: " + lives, 10, 60);
 
 }
 
-// Functions for drawing gradients of bases and missiles
+/**
+ * Functions for drawing gradients of bases and missiles
+ */
 void baseGradient(float x, float y, float w, float h, color c1, color c2) {
   noStroke();
   for (float i = y; i <= y + h; i++) {
